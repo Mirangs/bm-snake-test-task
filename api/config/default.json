@@ -1,0 +1,25 @@
+{
+	"port": 3000,
+	"mongoose": {
+		"uri": "mongodb://localhost:27017/bm-snake-test-task",
+		"options": {
+			"useNewUrlParser": true,
+			"useUnifiedTopology": true
+		}
+	},
+  "log4js": {
+		"pm2": true,
+		"pm2InstanceVar": "INSTANCE_ID",
+		"appenders": {
+			"app": {
+				"type": "stdout"
+			}
+		},
+		"categories": {
+			"default": {
+				"appenders": ["app"],
+				"level": "DEBUG"
+			}
+		}
+	}
+}
