@@ -80,6 +80,12 @@ const saveRating: RequestHandler = async (req, res) => {
 
 		const totalRating = ratingFound.rating + rating;
 		const updated = await ratingFound.updateOne({ rating: totalRating });
+		const userLevel = isUserFound.level;
+		if (userLevel < 10 && userLevel) {
+			await isUserFound.update({
+				level: userLevel + 1,
+			});
+		}
 		return res.status(200).json({ success: true, data: updated });
 	} catch (err) {
 		log.error(`Error at saveRating: ${err}`);

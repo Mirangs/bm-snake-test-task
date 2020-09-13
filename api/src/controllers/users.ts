@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import log4js from "log4js";
+import validator from "validator";
 import { UserModel } from "../models/user";
 
 const log = log4js.getLogger("usersController");
@@ -44,7 +45,28 @@ const createUser: RequestHandler = async (req, res) => {
 	}
 };
 
+const getUserById: RequestHandler = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		if (!id) {
+			return res.status(400).json({ error: "Need to provide userId" });
+		}
+
+		if (!validator.isMongoId(id)) {
+			return res.status(400).json({ error: "Invalid userId" });
+		}
+
+		const user = await UserModel.findById(id);
+		return res.status(200).json({ data: user });
+	} catch (err) {
+		log.error(`Error at getUserById, ${err}`);
+		return res.status(500).json({ error: "Something went wrong" });
+	}
+};
+
 export const users = {
 	getUsers,
 	createUser,
+	getUserById,
 };
