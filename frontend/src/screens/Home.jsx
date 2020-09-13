@@ -1,30 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { IonPhaser } from '@ion-phaser/react';
 import validator from 'validator';
-import gameConfig from '../game';
 
-export const Home = () => {
-  const [game, setGame] = useState();
+export const Home = ({ game, startGame }) => {
+  const [level, setLevel] = useState(1);
   const [name, setName] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      return;
-    }
+    (async () => {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        return;
+      }
 
-    if (!validator.isMongoId(userId)) {
-      localStorage.removeItem('userId');
-      return setError('Invalid userId');
-    }
+      if (!validator.isMongoId(userId)) {
+        localStorage.removeItem('userId');
+        return setError('Invalid userId');
+      }
 
-    return startGame();
+      const isUserExists = await fetch(
+        `http://localhost:3000/api/users/${userId}`
+      ).then((res) => res.json());
+      if (!isUserExists.data) {
+        localStorage.removeItem('userId');
+        return setError('User does not exists');
+      }
+
+      localStorage.setItem('level', isUserExists.data.level);
+      setLevel(isUserExists.data.level || 1);
+      return startGame();
+    })();
   }, []);
-
-  const startGame = () => {
-    setGame(gameConfig);
-  };
 
   const nameSubmitted = async (evt) => {
     evt.preventDefault();
@@ -45,6 +52,7 @@ export const Home = () => {
 
       if (isUserExists.success && isUserExists.data) {
         localStorage.setItem('userId', isUserExists.data._id);
+        localStorage.setItem('level', isUserExists.data.level);
         return startGame();
       }
 
@@ -61,7 +69,7 @@ export const Home = () => {
   return (
     <React.Fragment>
       <h1>Home</h1>
-      {!game && (
+      {!game ? (
         <form action='' onSubmit={nameSubmitted}>
           <input
             type='text'
@@ -74,8 +82,9 @@ export const Home = () => {
           </button>
           {error ? <p style={{ color: 'red' }}>{error}</p> : null}
         </form>
+      ) : (
+        <IonPhaser game={game} initialize={false} />
       )}
-      <IonPhaser game={game} />
     </React.Fragment>
   );
 };

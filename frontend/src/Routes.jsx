@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 import { Home } from './screens/Home';
 import { Ratings } from './screens/Ratings';
 
-export const Routes = () => (
+export const Routes = ({ game, startGame }) => (
   <Router>
     <div>
       <nav>
@@ -21,10 +21,10 @@ export const Routes = () => (
             renders the first one that matches the current URL. */}
       <Switch>
         <Route path='/ratings'>
-          <Ratings />
+          <Ratings game={game} />
         </Route>
         <Route path='/' exact>
-          <Home />
+          <Home game={game} startGame={startGame} />
         </Route>
       </Switch>
     </div>
