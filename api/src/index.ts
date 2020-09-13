@@ -2,6 +2,7 @@ import express from "express";
 import config from "config";
 import log4js from "log4js";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 import { connectToMongo } from "./helpers/connectToMongo";
 import apiRoutes from "./routes";
@@ -14,6 +15,7 @@ const app = express();
 connectToMongo();
 
 app.use(bodyParser.json());
+app.use(cors({ origin: "http://localhost:8080", credentials: true }));
 
 app.use("/api", apiRoutes);
 
